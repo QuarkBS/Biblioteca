@@ -1,0 +1,76 @@
+﻿@page "/"
+@inject HttpClient Http
+
+<h1>Universidad de Telememes</h1>
+
+<form>
+    <div class="form-group">
+        <label for="buscar">Busqueda</label>
+        <input type="text" class="form-control" id="busqueda" @bind="Filter" placeholder="Ingrese el término de la búsqueda">
+    </div>
+    <button type="button" class="btn btn-primary" @onclick="()=>buscar()">Buscar</button>
+    <button type="button" class="btn btn-secondary" @onclick="limpiar">Limpiar</button>
+</form>
+
+@if (losLibros != null)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <td>Id</td>
+                <td>Título</td>
+                <td>Autor</td>
+                <td>Clasificación</td>
+                <td>Edición</td>
+                <td>Volúmen</td>
+                <td>ISBN</td>
+                <td>Número de ejemplar</td>
+                <td>Biblioteca</td>
+                <td>Campus</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Libro libro in losLibros)
+            {
+                <tr>
+                    <td>@libro.Id</td>
+                    <td>@libro.Titulo</td>
+                    <td>@libro.Autor</td>
+                    <td>@libro.Clasificacion</td>
+                    <td>@libro.Edicion</td>
+                    <td>@libro.Volumen</td>
+                    <td>@libro.ISBN</td>
+                    <td>@libro.NoEjemplar</td>
+                    <td>@libro.Biblioteca.Nombre</td>
+                    <td>@libro.Campus</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code{
+    public List<Libro> losLibros;
+    public string Filter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        losLibros = await Http.GetFromJsonAsync<List<Libro>>($"/api/index/{Filter}");
+    }
+
+    private async Task limpiar()
+    {
+        Filter = string.Empty;
+        await Cargar();
+    }
+
+    private async Task buscar()
+    {
+        await Cargar();
+    }
+}

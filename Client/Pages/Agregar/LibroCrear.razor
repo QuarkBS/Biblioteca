@@ -1,0 +1,63 @@
+﻿@page "/agregar/LibroCrear"
+@inject HttpClient Http
+@inject NavigationManager Navegar
+
+<h3>Agrear libro</h3>
+<EditForm Model="@elLibro" OnValidSubmit="Guardar">
+    <div class="row mb-3">
+        <div class="col">
+            <label>Título</label>
+            <InputText class="form-control" @bind-Value="elLibro.Titulo"></InputText>
+        </div>
+        <div class="col">
+            <label>Autor</label>
+            <InputText class="form-control" @bind-Value="elLibro.Autor"></InputText>
+        </div>
+        <div class="col">
+            <label>Clasificación</label>
+            <InputText class="form-control" @bind-Value="elLibro.Clasificacion"></InputText>
+        </div>
+        <div class="col">
+            <label>ISBN</label>
+            <InputText class="form-control" @bind-Value="elLibro.ISBN"></InputText>
+        </div>
+        <div class="col">
+            <label>Edición</label>
+            <InputNumber class="form-control" @bind-Value="elLibro.Edicion"></InputNumber>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <label>Volúmen</label>
+            <InputNumber class="form-control" @bind-Value="elLibro.Volumen"></InputNumber>
+        </div>
+        <div class="col">
+            <label>Número de ejemplar</label>
+            <InputNumber class="form-control" @bind-Value="elLibro.NoEjemplar"></InputNumber>
+        </div>
+        <div class="col">
+            <label>Id de biblioteca</label>
+            <InputNumber class="form-control" @bind-Value="elLibro.BibliotecaId"></InputNumber>
+        </div>
+        <div class="col">
+            <label>Nombre del campus</label>
+            <InputText class="form-control" @bind-Value="elLibro.Campus"></InputText>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <button type="submit" class="btn btn-success">Aceptar</button>
+        </div>
+    </div>
+</EditForm>
+@code {
+    private Libro elLibro = new Libro();
+
+    private async Task Guardar()
+    {
+        await Http.PostAsJsonAsync("/api/Libros", elLibro);
+        Navegar.NavigateTo("/AgregarLibro");
+    }
+}

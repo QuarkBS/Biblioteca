@@ -1,0 +1,33 @@
+﻿@page "/agregar/EstudianteCrear"
+@inject HttpClient Http
+@inject NavigationManager Navegar
+
+<h3>Agrear estudiante</h3>
+
+<EditForm Model="@elEstudiante" OnValidSubmit="Guardar">
+    <div class="row mb-3">
+        <div class="col">
+            <label>Nombre del Estudiante</label>
+            <InputText class="form-control" @bind-Value="elEstudiante.Nombre"></InputText>
+        </div>
+        <div class="col">
+            <label>Nombre del Campus</label>
+            <InputText class="form-control" @bind-Value="elEstudiante.Campus"></InputText>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <button type="submit" class="btn btn-success">Aceptar</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Estudiante elEstudiante = new Estudiante();
+
+    private async Task Guardar()
+    {
+        await Http.PostAsJsonAsync("/api/Estudiantes", elEstudiante);
+        Navegar.NavigateTo("/AgregarEstudiante");
+    }
+}

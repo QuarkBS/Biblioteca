@@ -1,0 +1,37 @@
+﻿@page "/agregar/PrestamosCrear"
+@inject HttpClient Http
+@inject NavigationManager Navegar
+
+<h3>Agrear prestamo</h3>
+
+<EditForm Model="@elPrestamo" OnValidSubmit="Guardar">
+    <div class="row mb-3">
+        <div class="col">
+            <label>Id del estudiante</label>
+            <InputNumber class="form-control" @bind-Value="elPrestamo.EstudianteId"></InputNumber>
+        </div>
+        <div class="col">
+            <label>Id del libro</label>
+            <InputNumber class="form-control" @bind-Value="elPrestamo.LibroId"></InputNumber>
+        </div>
+        <div class="col">
+            <label>Fecha de retiro</label>
+            <InputDate class="form-control" @bind-Value="elPrestamo.Fecha"></InputDate>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <button type="submit" class="btn btn-success">Aceptar</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Prestamos elPrestamo = new Prestamos();
+
+    private async Task Guardar()
+    {
+        await Http.PostAsJsonAsync("/api/Prestamos", elPrestamo);
+        Navegar.NavigateTo("/AgregarPrestamo");
+    }
+}

@@ -1,0 +1,44 @@
+﻿@page "/Agregar/EstudianteEditar/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager Navegar
+
+<h3>Estudiante Editar</h3>
+
+@if (elEstudiante != null)
+{
+<EditForm Model="@elEstudiante" OnValidSubmit="Guardar">
+    <div class="row mb-3">
+        <div class="col">
+            <label>Nombre del Estudiante</label>
+            <InputText class="form-control" @bind-Value="elEstudiante.Nombre"></InputText>
+        </div>
+        <div class="col">
+            <label>Nombre del Campus</label>
+            <InputText class="form-control" @bind-Value="elEstudiante.Campus"></InputText>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <button type="submit" class="btn btn-success">Aceptar</button>
+        </div>
+    </div>
+</EditForm>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public Estudiante elEstudiante;
+
+    protected override async Task OnInitializedAsync()
+    {
+        elEstudiante = await Http.GetFromJsonAsync<Estudiante>($"/api/Estudiantes/{Id}");
+    }
+
+    private async Task Guardar()
+    {
+        await Http.PutAsJsonAsync($"/api/Estudiantes/{elEstudiante.Id}", elEstudiante);
+        Navegar.NavigateTo("/AgregarEstudiante");
+    }
+}

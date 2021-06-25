@@ -1,0 +1,136 @@
+﻿@page "/AgregarLibro"
+@inject HttpClient Http
+@inject NavigationManager Navegar
+
+<h3>Registros de libros</h3>
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" href="/Agregar">Index</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="/AgregarLibro">Agregar libro</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/AgregarEstudiante">Agregar estudiante</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/AgregarPrestamo">Agregar prestamo</a>
+    </li>
+</ul>
+
+<div class="row mb-3">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="()=> { Nuevo(); }">Agregar nuevo libro</button>
+    </div>
+</div>
+@if (losLibros != null)
+{
+    <div class="row mb-3">
+        <div class="col">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Id</td>
+                        <td>Título</td>
+                        <td>Autor</td>
+                        <td>Clasificación</td>
+                        <td>Edición</td>
+                        <td>Volúmen</td>
+                        <td>ISBN</td>
+                        <td>Número de ejemplar</td>
+                        <td>Biblioteca</td>
+                        <td>Campus</td>
+                        <td>Editar</td>
+                        <td>Eliminar</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Libro libro in losLibros)
+                    {
+                        <tr>
+                            <td>@libro.Id</td>
+                            <td>@libro.Titulo</td>
+                            <td>@libro.Autor</td>
+                            <td>@libro.Clasificacion</td>
+                            <td>@libro.Edicion</td>
+                            <td>@libro.Volumen</td>
+                            <td>@libro.ISBN</td>
+                            <td>@libro.NoEjemplar</td>
+                            <td>@libro.Biblioteca.Nombre</td>
+                            <td>@libro.Campus</td>
+                            <td><button class="btn btn-primary" @onclick="()=> { Modificar(libro.Id); }">Editar</button></td>
+                            <td><button class="btn btn-danger" @onclick="()=> { eliminar(libro.Id); }">Eliminar</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (mostrarMensaje == true)
+{
+    <div class="modal" tabindex="-1" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eliminar</h5>
+                </div>
+                <div class="modal-body" role="alert">
+                    <p>¿Estás seguro de querer eliminar el registro? No puede deshacerse la acción.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="borrar">Eliminar</button>
+                    <button type="button" class="btn btn-secondary" @onclick="cancelar">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public List<Libro> losLibros;
+    public int BorrarId;
+    public bool mostrarMensaje = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        losLibros = await Http.GetFromJsonAsync<List<Libro>>("/api/libros");
+    }
+
+    private void Nuevo()
+    {
+        Navegar.NavigateTo("/agregar/LibroCrear");
+    }
+
+    private void eliminar(int id)
+    {
+        BorrarId = id;
+        mostrarMensaje = true;
+    }
+
+    private async Task cancelar()
+    {
+        BorrarId = 0;
+        mostrarMensaje = false;
+        await Cargar();
+    }
+
+    private void Modificar(int id)
+    {
+        Navegar.NavigateTo($"/Agregar/librosEditar/{id}");
+    }
+
+    private async Task borrar()
+    {
+        await Http.DeleteAsync($"/api/libros/{BorrarId}");
+        await Cargar();
+        mostrarMensaje = false;
+    }
+}

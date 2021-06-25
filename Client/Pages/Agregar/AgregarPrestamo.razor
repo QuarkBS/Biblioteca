@@ -1,0 +1,127 @@
+﻿@page "/AgregarPrestamo"
+@inject HttpClient Http
+@inject NavigationManager Navegar
+
+<h3>Registros de prestamos</h3>
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" href="/Agregar">Index</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/AgregarLibro">Agregar libro</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/AgregarEstudiante">Agregar estudiante</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="/AgregarPrestamo">Agregar prestamo</a>
+    </li>
+</ul>
+
+<div class="row mb-3">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="()=> { Nuevo(); }">Agregar nuevo prestamo</button>
+    </div>
+</div>
+
+@if (losPrestamos != null)
+{
+<div class="row mb-3">
+    <div class="col">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <td>Id de préstamo</td>
+                    <td>Título del libro</td>
+                    <td>Fecha de retiro</td>
+                    <td>Fecha de entrega</td>
+                    <td>Id Estudiante</td>
+                    <td>Editar</td>
+                    <td>Eliminar</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Prestamos prestamo in losPrestamos)
+                {
+                    <tr>
+                        <td>@prestamo.Id</td>
+                        <td>@prestamo.Libro.Titulo</td>
+                        <td>@prestamo.Fecha</td>
+                        <td>@prestamo.Fecha.AddDays(5)</td>
+                        <td>@prestamo.EstudianteId</td>
+                        <td><button class="btn btn-primary" @onclick="()=> { Modificar(prestamo.Id); }">Editar</button></td>
+                        <td><button class="btn btn-danger" @onclick="()=> { eliminar(prestamo.Id); }">Eliminar</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+}
+
+@if (mostrarMensaje == true)
+{
+    <div class="modal" tabindex="-1" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eliminar</h5>
+                </div>
+                <div class="modal-body" role="alert">
+                    <p>¿Estás seguro de querer eliminar el registro? No puede deshacerse la acción.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="borrar">Eliminar</button>
+                    <button type="button" class="btn btn-secondary" @onclick="cancelar">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public List<Prestamos> losPrestamos;
+    public int BorrarId;
+    public bool mostrarMensaje = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        losPrestamos = await Http.GetFromJsonAsync<List<Prestamos>>("/api/prestamos");
+    }
+
+    private void Nuevo()
+    {
+        Navegar.NavigateTo("/agregar/PrestamosCrear");
+    }
+
+    private void eliminar(int id)
+    {
+        BorrarId = id;
+        mostrarMensaje = true;
+    }
+
+    private async Task cancelar()
+    {
+        BorrarId = 0;
+        mostrarMensaje = false;
+        await Cargar();
+    }
+
+    private void Modificar(int id)
+    {
+        Navegar.NavigateTo($"/Agregar/prestamosEditar/{id}");
+    }
+
+    private async Task borrar()
+    {
+        await Http.DeleteAsync($"/api/prestamos/{BorrarId}");
+        await Cargar();
+        mostrarMensaje = false;
+    }
+}
